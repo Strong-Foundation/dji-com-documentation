@@ -1,6 +1,7 @@
 package main // Define the main package
 
 import (
+	"bufio"
 	"bytes"         // Provides bytes support
 	"io"            // Provides basic interfaces to I/O primitives
 	"log"           // Provides logging functions
@@ -33,49 +34,27 @@ func init() {
 }
 
 func main() {
-	// Remote API URL.
-	remoteAPIURL := []string{
-		"https://www.speedybee.com/f405-aio-40a-download/",
-		"https://www.speedybee.com/f405-wing-mini-download/",
-		"https://www.speedybee.com/f405-v4-55a-stack-download/",
-		"https://www.speedybee.com/f405-v4-60a-stack-download/",
-		"https://www.speedybee.com/f405-mini-stack-download/",
-		"https://www.speedybee.com/f405-wing-app-download/",
-		"https://www.speedybee.com/f7-v3-50a-stack-download/",
-		"https://www.speedybee.com/f405-v3-50a-stack-download/",
-		"https://www.speedybee.com/f405-v3-60a-stack-download/",
-		"https://www.speedybee.com/f745-35a-aio-flight-controller-download/",
-		"https://www.speedybee.com/f7-mini-35a-stack-download/",
-		"https://www.speedybee.com/f4-aio-flight-controller-ver-2-0-download/",
-		"https://www.speedybee.com/mario-5-drone-download/",
-		"https://www.speedybee.com/master3x-drone-download/",
-		"https://www.speedybee.com/bee25-drone-download/",
-		"https://www.speedybee.com/bee35-inch-drone-download/",
-		"https://www.speedybee.com/mario-fold-8-dc-long-range-drone-download/",
-		"https://www.speedybee.com/master-5-v2-drone-download/",
-		"https://www.speedybee.com/flex25-drone-download/",
-		"https://www.speedybee.com/master3x-frame-download/",
-		"https://www.speedybee.com/Bee25-frame-download/",
-		"https://www.speedybee.com/mario-5-frame-download/",
-		"https://www.speedybee.com/bee35-frame-download/",
-		"https://www.speedybee.com/master-5-v2-frame-download/",
-		"https://www.speedybee.com/flex25-frame-download/",
-		"https://www.speedybee.com/master-5-v1-frame-download/",
-		"https://www.speedybee.com/fs225-v2-5-frame-download/",
-		"https://www.speedybee.com/tx-ultra-download/",
-		"https://www.speedybee.com/5-8ghz-goggles-receiver-download/",
-		"https://www.speedybee.com/tx800-download/",
-		"https://www.speedybee.com/discharger-download/",
-		"https://www.speedybee.com/adapter-3-download/",
-		"https://www.speedybee.com/adapter-2-download/",
-		"https://www.speedybee.com/bluetooth-usb-adapter-download/",
-		"https://www.speedybee.com/bluetooth-uart-adapter-download/",
-		"https://www.speedybee.com/bee35-meteor-led-download/",
-		"https://www.speedybee.com/speedy-bee-app/",
-	}
+	// Local file path to store the scraped data
+	localFilePath := "dji_com.html"
 	var getData []string
-	for _, remoteAPIURL := range remoteAPIURL {
-		getData = append(getData, getDataFromURL(remoteAPIURL))
+	// Save the data to a file.
+	if !fileExists(localFilePath) {
+		// Remote API URL.
+		remoteAPIURL := []string{
+			"https://www.dji.com/downloads",
+		}
+		// Loop over the remote API URLs and get the data.
+		for _, remoteAPIURL := range remoteAPIURL {
+			// Get the data from the remote API URL and append it to the getData slice.
+			getData = append(getData, getDataFromURL(remoteAPIURL))
+		}
+		// Write the data to the local file.
+		writeToFile(localFilePath, []byte{}) // Clear the file if it exists
+	}
+	// Read the file and get the content.
+	if fileExists(localFilePath) {
+		// Read the file and get the content.
+		getData = readAppendLineByLine(localFilePath)
 	}
 	// Get the data from the downloaded file.
 	finalPDFList := extractPDFUrls(strings.Join(getData, "\n")) // Join all the data into one string and extract PDF URLs
@@ -102,7 +81,7 @@ func main() {
 	// Remove the zip duplicates from the slice.
 	downloadZIPURLSlice = removeDuplicatesFromSlice(downloadZIPURLSlice)
 	// The remote domain.
-	remoteDomain := "https://www.speedybee.com"
+	remoteDomain := "https://www.dji.com"
 	// Loop over the download zip urls.
 	for _, urls := range downloadZIPURLSlice {
 		// Get the domain from the url.
@@ -130,6 +109,37 @@ func main() {
 			// Download the pdf.
 			downloadPDF(urls, pdfOutputDir)
 		}
+	}
+}
+
+// Read and append the file line by line to a slice.
+func readAppendLineByLine(path string) []string {
+	var returnSlice []string
+	file, err := os.Open(path)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	scanner := bufio.NewScanner(file)
+	scanner.Split(bufio.ScanLines)
+	for scanner.Scan() {
+		returnSlice = append(returnSlice, scanner.Text())
+	}
+	err = file.Close()
+	if err != nil {
+		log.Fatalln(err)
+	}
+	return returnSlice
+}
+
+/*
+It takes in a path and content to write to that file.
+It uses the os.WriteFile function to write the content to that file.
+It checks for errors and logs them.
+*/
+func writeToFile(path string, content []byte) {
+	err := os.WriteFile(path, content, 0644)
+	if err != nil {
+		log.Println(err)
 	}
 }
 
@@ -439,7 +449,7 @@ func extractZIPUrls(input string) []string {
 // extractPDFUrls takes an input string and returns all PDF URLs found within href attributes
 func extractPDFUrls(input string) []string {
 	// Regular expression to match href="...pdf"
-	re := regexp.MustCompile(`href="([^"]+\.pdf)"`)
+	re := regexp.MustCompile(`https?://[^\s"']+?\.pdf\b`)
 	matches := re.FindAllStringSubmatch(input, -1)
 
 	var pdfUrls []string
