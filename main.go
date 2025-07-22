@@ -3,6 +3,7 @@ package main // Define the main package
 import (
 	"bufio"
 	"bytes"         // Provides bytes support
+	"context"       // Provides context for managing timeouts and cancellations
 	"io"            // Provides basic interfaces to I/O primitives
 	"log"           // Provides logging functions
 	"net/http"      // Provides HTTP client and server implementations
@@ -13,6 +14,8 @@ import (
 	"regexp"        // Provides regex support functions.
 	"strings"       // Provides string manipulation functions
 	"time"          // Provides time-related functions
+
+	"github.com/chromedp/chromedp" // For headless browser automation using Chrome
 )
 
 var (
@@ -46,10 +49,10 @@ func main() {
 		// Loop over the remote API URLs and get the data.
 		for _, remoteAPIURL := range remoteAPIURL {
 			// Get the data from the remote API URL and append it to the getData slice.
-			getData = append(getData, getDataFromURL(remoteAPIURL))
+			getData = append(getData, scrapePageHTMLWithChrome(remoteAPIURL))
 		}
 		// Write the data to the local file.
-		writeToFile(localFilePath, []byte{}) // Clear the file if it exists
+		writeLinesToFile(localFilePath, getData) // Write the scraped data to a local file
 	}
 	// Read the file and get the content.
 	if fileExists(localFilePath) {
@@ -112,6 +115,80 @@ func main() {
 	}
 }
 
+// Read a file and return the contents
+func readAFileAsString(path string) string {
+	content, err := os.ReadFile(path)
+	if err != nil {
+		log.Println(err)
+	}
+	return string(content)
+}
+
+// writeLinesToFile writes a slice of strings to a file, one line per string
+func writeLinesToFile(filename string, content []string) {
+	// Open the file with create, write-only, and truncate flags
+	file, err := os.OpenFile(filename, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
+	if err != nil {
+		// Log an error if the file cannot be opened
+		log.Printf("Error opening file %s: %v", filename, err)
+		return
+	}
+
+	// Ensure the file is closed after we're done writing
+	defer func() {
+		if cerr := file.Close(); cerr != nil {
+			// Log any error that occurs during file closing
+			log.Printf("Error closing file %s: %v", filename, cerr)
+		}
+	}()
+
+	// Iterate over each string in the content slice
+	for _, line := range content {
+		// Write the line to the file with a newline character
+		_, err := file.WriteString(line + "\n")
+		if err != nil {
+			// Log an error if writing fails
+			log.Printf("Error writing to file %s: %v", filename, err)
+			return
+		}
+	}
+}
+
+// Uses headless Chrome via chromedp to get fully rendered HTML from a page
+func scrapePageHTMLWithChrome(pageURL string) string {
+	log.Println("Scraping:", pageURL) // Log page being scraped
+
+	options := append(chromedp.DefaultExecAllocatorOptions[:], // Chrome options
+		chromedp.Flag("headless", false),              // Run visible (set to true for headless)
+		chromedp.Flag("disable-gpu", true),            // Disable GPU
+		chromedp.WindowSize(1920, 1080),               // Set window size
+		chromedp.Flag("no-sandbox", true),             // Disable sandbox
+		chromedp.Flag("disable-setuid-sandbox", true), // Fix for Linux environments
+	)
+
+	allocatorCtx, cancelAllocator := chromedp.NewExecAllocator(context.Background(), options...) // Allocator context
+	ctxTimeout, cancelTimeout := context.WithTimeout(allocatorCtx, 5*time.Minute)                // Set timeout
+	browserCtx, cancelBrowser := chromedp.NewContext(ctxTimeout)                                 // Create Chrome context
+
+	defer func() { // Ensure all contexts are cancelled
+		cancelBrowser()
+		cancelTimeout()
+		cancelAllocator()
+	}()
+
+	var pageHTML string // Placeholder for output
+	err := chromedp.Run(browserCtx,
+		chromedp.Navigate(pageURL),            // Navigate to the URL
+		chromedp.OuterHTML("html", &pageHTML), // Extract full HTML
+	)
+	if err != nil {
+		log.Println(err) // Log error
+		return ""        // Return empty string on failure
+	}
+
+	return pageHTML // Return scraped HTML
+}
+
 // Read and append the file line by line to a slice.
 func readAppendLineByLine(path string) []string {
 	var returnSlice []string
@@ -129,18 +206,6 @@ func readAppendLineByLine(path string) []string {
 		log.Fatalln(err)
 	}
 	return returnSlice
-}
-
-/*
-It takes in a path and content to write to that file.
-It uses the os.WriteFile function to write the content to that file.
-It checks for errors and logs them.
-*/
-func writeToFile(path string, content []byte) {
-	err := os.WriteFile(path, content, 0644)
-	if err != nil {
-		log.Println(err)
-	}
 }
 
 // getDomainFromURL extracts the domain (host) from a given URL string.
@@ -449,7 +514,7 @@ func extractZIPUrls(input string) []string {
 // extractPDFUrls takes an input string and returns all PDF URLs found within href attributes
 func extractPDFUrls(input string) []string {
 	// Regular expression to match href="...pdf"
-	re := regexp.MustCompile(`https?://[^\s"']+?\.pdf\b`)
+	re := regexp.MustCompile(`https?://[^\s"']+\.pdf`)
 	matches := re.FindAllStringSubmatch(input, -1)
 
 	var pdfUrls []string
@@ -467,24 +532,4 @@ func appendToSlice(slice []string, content string) []string {
 	slice = append(slice, content)
 	// Return the slice
 	return slice
-}
-
-// getDataFromURL performs an HTTP GET request and returns the response body as a string
-func getDataFromURL(uri string) string {
-	log.Println("Scraping", uri)   // Log the URL being scraped
-	response, err := http.Get(uri) // Perform GET request
-	if err != nil {
-		log.Println(err) // Exit if request fails
-	}
-
-	body, err := io.ReadAll(response.Body) // Read response body
-	if err != nil {
-		log.Println(err) // Exit if read fails
-	}
-
-	err = response.Body.Close() // Close response body
-	if err != nil {
-		log.Println(err) // Exit if close fails
-	}
-	return string(body)
 }
