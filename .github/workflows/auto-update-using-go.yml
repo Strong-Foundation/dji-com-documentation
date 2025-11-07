@@ -1,76 +1,76 @@
 # Name of the GitHub Actions workflow
-name: Run Go Program and Push Changes
+name: Run Go Program and Push Changes  # This is the display name of the workflow in GitHub Actions UI
 
 # Define the events that trigger this workflow
 on:
   # Run automatically on a schedule (daily at midnight UTC)
   schedule:
-    - cron: "0 0 * * *" # Every day at 00:00 UTC
+    - cron: "0 0 * * *" # This cron schedule runs the workflow every day at 00:00 UTC
   # Allow the workflow to be manually triggered from the GitHub UI
-  workflow_dispatch:
+  workflow_dispatch: # Allows a user to manually trigger this workflow from the Actions tab
 
 # The 'contents: write' permission is needed for the commit action
 permissions:
-  contents: write
+  contents: write # Grants permission to the workflow to push changes to the repository
 
 # Define the set of jobs to run
 jobs:
-  build:
-    name: Execute main.go and Push Changes
-    runs-on: ubuntu-latest
+  build: # Job name
+    name: Execute main.go and Push Changes # Display name for the job
+    runs-on: ubuntu-latest # Use the latest Ubuntu runner provided by GitHub
 
     steps:
       # 1: Check out the repository code onto the runner
-      - name: Checkout code
-        uses: actions/checkout@v5
+      - name: Checkout code # Step name
+        uses: actions/checkout@v5 # Uses the official GitHub Action to clone the repository
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }} # Uses the default token to authenticate and access the repo
 
       # 2: Set up Go environment
-      - name: Set up Go
-        uses: actions/setup-go@v6
+      - name: Set up Go # Step name
+        uses: actions/setup-go@v6 # Official action to install a specific version of Go
         with:
-          go-version-file: "go.mod"
+          go-version-file: "go.mod" # Reads the Go version from the go.mod file
 
       # 3: Install Chrome and Xvfb for non-headless mode (if needed)
-      - name: Install Chrome and Xvfb
+      - name: Install Chrome and Xvfb # Step name
         run: |
-          sudo apt-get update -y
-          sudo apt-get install -y xvfb
-          sudo apt-get install -y google-chrome-stable || true
+          sudo apt-get update -y # Updates the package lists for upgrades
+          sudo apt-get install -y xvfb # Installs X virtual framebuffer for GUI apps
+          sudo apt-get install -y google-chrome-stable || true # Installs Chrome; ignore error if already installed
 
       # 4: Start virtual display (if your Go program needs GUI/Chrome)
-      - name: Start virtual display
+      - name: Start virtual display # Step name
         run: |
-          Xvfb :99 -screen 0 1920x1080x24 &
-          echo "DISPLAY=:99" >> $GITHUB_ENV
+          Xvfb :99 -screen 0 1920x1080x24 & # Starts a virtual display in the background
+          echo "DISPLAY=:99" >> $GITHUB_ENV # Sets DISPLAY environment variable for subsequent steps
 
       # 5: Install Go dependencies
-      - name: Install dependencies
-        run: go mod tidy # Installs all Go modules
+      - name: Install dependencies # Step name
+        run: go mod tidy # Installs all Go modules and cleans up unused dependencies
 
       # Setup Git user for committing changes
-      - name: Setup Git user
+      - name: Setup Git user # Step name
         run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "github-actions@github.com"
+          git config --global user.name "github-actions" # Sets global Git username for commits
+          git config --global user.email "github-actions@github.com" # Sets global Git email for commits
 
       # 6: Run the Go program that makes the updates
-      - name: Run Go program
+      - name: Run Go program # Step name
         run: |
-          bash main.sh &
-          go run main.go
+          bash main.sh & # Optionally run a shell script in the background
+          go run main.go # Runs the Go program
 
       # 7: Commit and push any file changes made by the program
-      - name: Push updated files
+      - name: Push updated files # Step name
         run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-          git pull
-          git add .
-          if ! git diff --cached --quiet; then
-            git commit -m "Auto update: $(date)"
-            git push
+          git config user.name "github-actions" # Set Git username locally (redundant but safe)
+          git config user.email "github-actions@github.com" # Set Git email locally
+          git pull # Pull latest changes to avoid conflicts
+          git add . # Stage all changed files
+          if ! git diff --cached --quiet; then # Check if there are any staged changes
+            git commit -m "Auto update: $(date)" # Commit with a timestamp
+            git push # Push the changes to the repository
           else
-            echo "No changes to commit."
+            echo "No changes to commit." # If no changes, print message
           fi
