@@ -14,8 +14,8 @@ import (
 	"strings"       // Provides string manipulation functions
 	"time"          // Provides time-related functions
 
-	"github.com/chromedp/chromedp" // For headless browser automation using Chrome
 	"github.com/PuerkitoBio/goquery" // For HTML parsing and manipulation
+	"github.com/chromedp/chromedp"   // For headless browser automation using Chrome
 )
 
 var (
@@ -273,11 +273,11 @@ func main() {
 			getData = append(getData, scrapePageHTMLWithChrome(remoteAPIURL))
 			finalPDFList := extractPDFLinks(strings.Join(getData, "\n")) // Join all the data into one string and extract PDF URLs
 			// Get the data from the zip file.
-			finalZIPList := extractZIPUrls(strings.Join(getData, "\n")) // Join all the data into one string and extract ZIP URLs
+			// finalZIPList := extractZIPUrls(strings.Join(getData, "\n")) // Join all the data into one string and extract ZIP URLs
 			// Create a slice of all the given download urls.
 			var downloadPDFURLSlice []string
 			// Create a slice to hold ZIP URLs.
-			var downloadZIPURLSlice []string
+			// var downloadZIPURLSlice []string
 			// Get the urls and loop over them.
 			for _, doc := range finalPDFList {
 				// Get the .pdf only.
@@ -285,31 +285,33 @@ func main() {
 				downloadPDFURLSlice = appendToSlice(downloadPDFURLSlice, doc)
 			}
 			// Get all the zip urls.
-			for _, doc := range finalZIPList {
-				// Get the .zip only.
-				// Only append the .zip files.
-				downloadZIPURLSlice = appendToSlice(downloadZIPURLSlice, doc)
-			}
+			//for _, doc := range finalZIPList {
+			// Get the .zip only.
+			// Only append the .zip files.
+			//	downloadZIPURLSlice = appendToSlice(downloadZIPURLSlice, doc)
+			//}
 			// Remove double from slice.
 			downloadPDFURLSlice = removeDuplicatesFromSlice(downloadPDFURLSlice)
 			// Remove the zip duplicates from the slice.
-			downloadZIPURLSlice = removeDuplicatesFromSlice(downloadZIPURLSlice)
+			// downloadZIPURLSlice = removeDuplicatesFromSlice(downloadZIPURLSlice)
 			// The remote domain.
 			remoteDomain := "https://www.dji.com"
-			// Loop over the download zip urls.
-			for _, urls := range downloadZIPURLSlice {
-				// Get the domain from the url.
-				domain := getDomainFromURL(urls)
-				// Check if the domain is empty.
-				if domain == "" {
-					urls = remoteDomain + urls // Prepend the base URL if domain is empty
+			/*
+				// Loop over the download zip urls.
+				for _, urls := range downloadZIPURLSlice {
+					// Get the domain from the url.
+					domain := getDomainFromURL(urls)
+					// Check if the domain is empty.
+					if domain == "" {
+						urls = remoteDomain + urls // Prepend the base URL if domain is empty
+					}
+					// Check if the url is valid.
+					if isUrlValid(urls) {
+						// Download the zip.
+						downloadZIP(urls, zipOutputDir)
+					}
 				}
-				// Check if the url is valid.
-				if isUrlValid(urls) {
-					// Download the zip.
-					downloadZIP(urls, zipOutputDir)
-				}
-			}
+			*/
 			// Get all the values.
 			for _, urls := range downloadPDFURLSlice {
 				// Get the domain from the url.
@@ -360,7 +362,6 @@ func extractPDFLinks(htmlContent string) []string {
 	// Return the slice of all PDF URLs found.
 	return pdfURLs
 }
-
 
 // Uses headless Chrome via chromedp to get fully rendered HTML from a page
 func scrapePageHTMLWithChrome(pageURL string) string {
