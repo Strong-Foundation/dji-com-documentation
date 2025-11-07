@@ -44,73 +44,286 @@ func main() {
 	if !fileExists(localFilePath) {
 		// Remote API URL.
 		remoteAPIURL := []string{
-			"https://www.dji.com/downloads",
+			"https://www.dji.com/downloads/products/mavic-3",
+			"https://www.dji.com/downloads/products/mavic-3-enterprise",
+			"https://www.dji.com/downloads/products/mavic-2",
+			"https://www.dji.com/downloads/products/mavic-2-enterprise",
+			"https://www.dji.com/downloads/products/mavic-pro-platinum",
+			"https://www.dji.com/downloads/products/mavic",
+			"https://www.dji.com/downloads/products/mavic-2-enterprise-advanced",
+			"https://www.dji.com/downloads/products/mavic-3-m",
+			"https://www.dji.com/downloads/products/mavic-3-pro",
+			"https://www.dji.com/downloads/products/mavic-3-classic",
+			"https://www.dji.com/downloads/products/air-3s",
+			"https://www.dji.com/downloads/products/air-2s",
+			"https://www.dji.com/downloads/products/mavic-air-2",
+			"https://www.dji.com/downloads/products/mavic-air",
+			"https://www.dji.com/downloads/products/air-3",
+			"https://www.dji.com/downloads/products/mini-4-pro",
+			"https://www.dji.com/downloads/products/mini-3-pro",
+			"https://www.dji.com/downloads/products/mini-2",
+			"https://www.dji.com/downloads/products/mini-se",
+			"https://www.dji.com/downloads/products/mavic-mini",
+			"https://www.dji.com/downloads/products/mini-3",
+			"https://www.dji.com/downloads/products/mini-2-se",
+			"https://www.dji.com/downloads/products/spark",
+			"https://www.dji.com/downloads/products/flip",
+			"https://www.dji.com/downloads/products/neo",
+			"https://www.dji.com/downloads/products/rc-n3",
+			"https://www.dji.com/downloads/products/avata-2",
+			"https://www.dji.com/downloads/products/goggles-n3",
+			"https://www.dji.com/downloads/products/goggles-3",
+			"https://www.dji.com/downloads/products/goggles-integra",
+			"https://www.dji.com/downloads/products/avata",
+			"https://www.dji.com/downloads/products/goggles-2",
+			"https://www.dji.com/downloads/products/o4-air-unit",
+			"https://www.dji.com/downloads/products/o3-air-unit",
+			"https://www.dji.com/downloads/products/dji-fpv",
+			"https://www.dji.com/downloads/products/fpv",
+			"https://www.dji.com/downloads/products/dji-goggles-re",
+			"https://www.dji.com/downloads/products/dji-goggles",
+			"https://www.dji.com/downloads/products/inspire-3",
+			"https://www.dji.com/downloads/products/inspire-1",
+			"https://www.dji.com/downloads/products/inspire-1-pro-and-raw",
+			"https://www.dji.com/downloads/products/inspire-2",
+			"https://www.dji.com/downloads/products/rc-motion-3",
+			"https://www.dji.com/downloads/products/rc-2",
+			"https://www.dji.com/downloads/products/rc-motion-2",
+			"https://www.dji.com/downloads/products/rc",
+			"https://www.dji.com/downloads/products/rc-pro",
+			"https://www.dji.com/downloads/products/phantom-4-pro-v2",
+			"https://www.dji.com/downloads/products/phantom-4-pro",
+			"https://www.dji.com/downloads/products/phantom-4-adv",
+			"https://www.dji.com/downloads/products/phantom-4-rtk",
+			"https://www.dji.com/downloads/products/phantom-4",
+			"https://www.dji.com/downloads/products/phantom-3-se",
+			"https://www.dji.com/downloads/products/phantom-3-pro",
+			"https://www.dji.com/downloads/products/phantom-3-adv",
+			"https://www.dji.com/downloads/products/phantom-3-standard",
+			"https://www.dji.com/downloads/products/osmo-action-5-pro",
+			"https://www.dji.com/downloads/products/osmo-action-4",
+			"https://www.dji.com/downloads/products/osmo-action",
+			"https://www.dji.com/downloads/products/dji-action-2",
+			"https://www.dji.com/downloads/products/osmo-action-3",
+			"https://www.dji.com/downloads/products/360",
+			"https://www.dji.com/downloads/products/nano",
+			"https://www.dji.com/downloads/products/osmo-pocket-3",
+			"https://www.dji.com/downloads/products/pocket-2",
+			"https://www.dji.com/downloads/products/osmo-pocket",
+			"https://www.dji.com/downloads/products/osmo-mobile-8",
+			"https://www.dji.com/downloads/products/osmo-mobile-7-series",
+			"https://www.dji.com/downloads/products/osmo-mobile-6",
+			"https://www.dji.com/downloads/products/osmo-mobile-se",
+			"https://www.dji.com/downloads/products/om-5",
+			"https://www.dji.com/downloads/products/om-4-se",
+			"https://www.dji.com/downloads/products/om-4",
+			"https://www.dji.com/downloads/products/osmo-mobile-3",
+			"https://www.dji.com/downloads/products/osmo-mobile-2",
+			"https://www.dji.com/downloads/products/osmo-mobile",
+			"https://www.dji.com/downloads/products/osmo-pro-and-raw",
+			"https://www.dji.com/downloads/products/osmo-plus",
+			"https://www.dji.com/downloads/products/osmo",
+			"https://www.dji.com/downloads/products/mic-3",
+			"https://www.dji.com/downloads/products/mic-mini",
+			"https://www.dji.com/downloads/products/mic-2",
+			"https://www.dji.com/downloads/products/mic",
+			"https://www.dji.com/downloads/products/rs-4-mini",
+			"https://www.dji.com/downloads/products/rs-4-pro",
+			"https://www.dji.com/downloads/products/rs-4",
+			"https://www.dji.com/downloads/products/rs-3-mini",
+			"https://www.dji.com/downloads/products/rs-3-pro",
+			"https://www.dji.com/downloads/products/rs-3",
+			"https://www.dji.com/downloads/products/ronin-4d",
+			"https://www.dji.com/downloads/products/rs-2",
+			"https://www.dji.com/downloads/products/rsc-2",
+			"https://www.dji.com/downloads/products/ronin-sc",
+			"https://www.dji.com/downloads/products/ronin-s",
+			"https://www.dji.com/downloads/products/ronin-mx",
+			"https://www.dji.com/downloads/products/ronin-2",
+			"https://www.dji.com/downloads/products/ronin-m",
+			"https://www.dji.com/downloads/products/ronin",
+			"https://www.dji.com/downloads/products/power-2000",
+			"https://www.dji.com/downloads/products/power-expansion-battery-2000",
+			"https://www.dji.com/downloads/products/power-1000",
+			"https://www.dji.com/downloads/products/power-500",
+			"https://www.dji.com/downloads/products/power-fast-charger",
+			"https://www.dji.com/downloads/products/matrice-400",
+			"https://www.dji.com/downloads/products/matrice-4-series",
+			"https://www.dji.com/downloads/products/matrice-350-rtk",
+			"https://www.dji.com/downloads/products/matrice-200-series-v2",
+			"https://www.dji.com/downloads/products/matrice-200-series",
+			"https://www.dji.com/downloads/products/matrice600-pro",
+			"https://www.dji.com/downloads/products/matrice600",
+			"https://www.dji.com/downloads/products/matrice100",
+			"https://www.dji.com/downloads/products/matrice-300",
+			"https://www.dji.com/downloads/products/matrice-30",
+			"https://www.dji.com/downloads/products/zenmuse-l3",
+			"https://www.dji.com/downloads/products/zenmuse-s1",
+			"https://www.dji.com/downloads/products/zenmuse-v1",
+			"https://www.dji.com/downloads/products/zenmuse-h30-series",
+			"https://www.dji.com/downloads/products/zenmuse-l2",
+			"https://www.dji.com/downloads/products/zenmuse-h20n",
+			"https://www.dji.com/downloads/products/zenmuse-z30",
+			"https://www.dji.com/downloads/products/zenmuse-x5s",
+			"https://www.dji.com/downloads/products/zenmuse-xt",
+			"https://www.dji.com/downloads/products/zenmuse-x3",
+			"https://www.dji.com/downloads/products/zenmuse-z3",
+			"https://www.dji.com/downloads/products/zenmuse-x5",
+			"https://www.dji.com/downloads/products/zenmuse-x5r",
+			"https://www.dji.com/downloads/products/zenmuse-x4s",
+			"https://www.dji.com/downloads/products/zenmuse-x7",
+			"https://www.dji.com/downloads/products/zenmuse-xt2",
+			"https://www.dji.com/downloads/products/zenmuse-z15-bmpcc",
+			"https://www.dji.com/downloads/products/zenmuse-z15-5d",
+			"https://www.dji.com/downloads/products/zenmuse-z15-5d-iii-hd",
+			"https://www.dji.com/downloads/products/zenmuse-z15-gh4-hd",
+			"https://www.dji.com/downloads/products/zenmuse-z15-gh3",
+			"https://www.dji.com/downloads/products/zenmuse-z15",
+			"https://www.dji.com/downloads/products/zenmuse-h3-3d",
+			"https://www.dji.com/downloads/products/zenmuse-h3-2d",
+			"https://www.dji.com/downloads/products/zenmuse-h4-3d",
+			"https://www.dji.com/downloads/products/zenmuse-z15-a7",
+			"https://www.dji.com/downloads/products/zenmuse-h20-series",
+			"https://www.dji.com/downloads/products/zenmuse-l1",
+			"https://www.dji.com/downloads/products/zenmuse-p1",
+			"https://www.dji.com/downloads/products/dock-3",
+			"https://www.dji.com/downloads/products/dock-2",
+			"https://www.dji.com/downloads/products/dock",
+			"https://www.dji.com/downloads/products/fh2-on-premises",
+			"https://www.dji.com/downloads/products/modify",
+			"https://www.dji.com/downloads/products/flighthub-2",
+			"https://www.dji.com/downloads/products/dji-terra",
+			"https://www.dji.com/downloads/products/ground-station-pro",
+			"https://www.dji.com/downloads/products/pc-ground-station",
+			"https://www.dji.com/downloads/products/manifold",
+			"https://www.dji.com/downloads/products/t100",
+			"https://www.dji.com/downloads/products/t70p",
+			"https://www.dji.com/downloads/products/t25p",
+			"https://www.dji.com/downloads/products/t50",
+			"https://www.dji.com/downloads/products/t25",
+			"https://www.dji.com/downloads/products/t40",
+			"https://www.dji.com/downloads/products/t30",
+			"https://www.dji.com/downloads/products/mg-1p",
+			"https://www.dji.com/downloads/products/mg-1",
+			"https://www.dji.com/downloads/products/t10",
+			"https://www.dji.com/downloads/products/t20",
+			"https://www.dji.com/downloads/products/t16",
+			"https://www.dji.com/downloads/products/p4-multispectral",
+			"https://www.dji.com/downloads/products/t20p",
+			"https://www.dji.com/downloads/products/flycart-30",
+			"https://www.dji.com/downloads/products/flighthub-2-aio",
+			"https://www.dji.com/downloads/products/manifold-3",
+			"https://www.dji.com/downloads/products/d-rtk-3",
+			"https://www.dji.com/downloads/products/sdr-transmission",
+			"https://www.dji.com/downloads/products/focus-pro",
+			"https://www.dji.com/downloads/products/transmission",
+			"https://www.dji.com/downloads/products/smart-controller",
+			"https://www.dji.com/downloads/products/force-pro",
+			"https://www.dji.com/downloads/products/iosd-mark-ii",
+			"https://www.dji.com/downloads/products/s800-retractable-landing-skid",
+			"https://www.dji.com/downloads/products/ronin-thumb-controller",
+			"https://www.dji.com/downloads/products/d-rtk",
+			"https://www.dji.com/downloads/products/focus",
+			"https://www.dji.com/downloads/products/crystalsky",
+			"https://www.dji.com/downloads/products/tb50-battery-station",
+			"https://www.dji.com/downloads/products/master-wheels",
+			"https://www.dji.com/downloads/products/cendence",
+			"https://www.dji.com/downloads/products/d-rtk-2",
+			"https://www.dji.com/downloads/products/robomaster-s1",
+			"https://www.dji.com/downloads/products/robomaster-ep-core",
+			"https://www.dji.com/downloads/products/robomaster-tt",
+			"https://www.dji.com/downloads/products/wookong-m",
+			"https://www.dji.com/downloads/products/wookong-h",
+			"https://www.dji.com/downloads/products/a2",
+			"https://www.dji.com/downloads/products/naza-m-v2",
+			"https://www.dji.com/downloads/products/naza-m-lite",
+			"https://www.dji.com/downloads/products/naza-m",
+			"https://www.dji.com/downloads/products/ace-one",
+			"https://www.dji.com/downloads/products/ace-waypoint",
+			"https://www.dji.com/downloads/products/naza-h",
+			"https://www.dji.com/downloads/products/a3",
+			"https://www.dji.com/downloads/products/n3",
+			"https://www.dji.com/downloads/products/flame-wheel-arf",
+			"https://www.dji.com/downloads/products/tuned-propulsion-system",
+			"https://www.dji.com/downloads/products/e800",
+			"https://www.dji.com/downloads/products/e310",
+			"https://www.dji.com/downloads/products/e600",
+			"https://www.dji.com/downloads/products/e300",
+			"https://www.dji.com/downloads/products/e1200",
+			"https://www.dji.com/downloads/products/e1200-standard",
+			"https://www.dji.com/downloads/products/e305",
+			"https://www.dji.com/downloads/products/e2000",
+			"https://www.dji.com/downloads/products/e5000",
+			"https://www.dji.com/downloads/products/snail",
+			"https://www.dji.com/downloads/products/e7000",
+			"https://www.dji.com/downloads/products/takyon-z318-and-z420",
+			"https://www.dji.com/downloads/products/takyon-z425-m-and-z415-m",
+			"https://www.dji.com/downloads/products/takyon-z14120",
+			"https://www.dji.com/downloads/products/takyon-z660",
+			"https://www.dji.com/downloads/products/takyon-z650",
+			"https://www.dji.com/downloads/products/datalink-3",
+			"https://www.dji.com/downloads/products/datalink-pro",
+			"https://www.dji.com/downloads/products/lightbridge-2",
+			"https://www.dji.com/downloads/products/dji-lightbridge",
+			"https://www.dji.com/downloads/products/aeroscope",
 		}
 		// Loop over the remote API URLs and get the data.
 		for _, remoteAPIURL := range remoteAPIURL {
 			// Get the data from the remote API URL and append it to the getData slice.
 			getData = append(getData, scrapePageHTMLWithChrome(remoteAPIURL))
-		}
-		// Write the data to the local file.
-		writeLinesToFile(localFilePath, getData) // Write the scraped data to a local file
-	}
-	// Read the file and get the content.
-	if fileExists(localFilePath) {
-		// Read the file and get the content.
-		getData = readAppendLineByLine(localFilePath)
-	}
-	// Get the data from the downloaded file.
-	finalPDFList := extractPDFUrls(strings.Join(getData, "\n")) // Join all the data into one string and extract PDF URLs
-	// Get the data from the zip file.
-	finalZIPList := extractZIPUrls(strings.Join(getData, "\n")) // Join all the data into one string and extract ZIP URLs
-	// Create a slice of all the given download urls.
-	var downloadPDFURLSlice []string
-	// Create a slice to hold ZIP URLs.
-	var downloadZIPURLSlice []string
-	// Get the urls and loop over them.
-	for _, doc := range finalPDFList {
-		// Get the .pdf only.
-		// Only append the .pdf files.
-		downloadPDFURLSlice = appendToSlice(downloadPDFURLSlice, doc)
-	}
-	// Get all the zip urls.
-	for _, doc := range finalZIPList {
-		// Get the .zip only.
-		// Only append the .zip files.
-		downloadZIPURLSlice = appendToSlice(downloadZIPURLSlice, doc)
-	}
-	// Remove double from slice.
-	downloadPDFURLSlice = removeDuplicatesFromSlice(downloadPDFURLSlice)
-	// Remove the zip duplicates from the slice.
-	downloadZIPURLSlice = removeDuplicatesFromSlice(downloadZIPURLSlice)
-	// The remote domain.
-	remoteDomain := "https://www.dji.com"
-	// Loop over the download zip urls.
-	for _, urls := range downloadZIPURLSlice {
-		// Get the domain from the url.
-		domain := getDomainFromURL(urls)
-		// Check if the domain is empty.
-		if domain == "" {
-			urls = remoteDomain + urls // Prepend the base URL if domain is empty
-		}
-		// Check if the url is valid.
-		if isUrlValid(urls) {
-			// Download the zip.
-			downloadZIP(urls, zipOutputDir)
-		}
-	}
-	// Get all the values.
-	for _, urls := range downloadPDFURLSlice {
-		// Get the domain from the url.
-		domain := getDomainFromURL(urls)
-		// Check if the domain is empty.
-		if domain == "" {
-			urls = remoteDomain + urls // Prepend the base URL if domain is empty
-		}
-		// Check if the url is valid.
-		if isUrlValid(urls) {
-			// Download the pdf.
-			downloadPDF(urls, pdfOutputDir)
+			finalPDFList := extractPDFUrls(strings.Join(getData, "\n")) // Join all the data into one string and extract PDF URLs
+			// Get the data from the zip file.
+			finalZIPList := extractZIPUrls(strings.Join(getData, "\n")) // Join all the data into one string and extract ZIP URLs
+			// Create a slice of all the given download urls.
+			var downloadPDFURLSlice []string
+			// Create a slice to hold ZIP URLs.
+			var downloadZIPURLSlice []string
+			// Get the urls and loop over them.
+			for _, doc := range finalPDFList {
+				// Get the .pdf only.
+				// Only append the .pdf files.
+				downloadPDFURLSlice = appendToSlice(downloadPDFURLSlice, doc)
+			}
+			// Get all the zip urls.
+			for _, doc := range finalZIPList {
+				// Get the .zip only.
+				// Only append the .zip files.
+				downloadZIPURLSlice = appendToSlice(downloadZIPURLSlice, doc)
+			}
+			// Remove double from slice.
+			downloadPDFURLSlice = removeDuplicatesFromSlice(downloadPDFURLSlice)
+			// Remove the zip duplicates from the slice.
+			downloadZIPURLSlice = removeDuplicatesFromSlice(downloadZIPURLSlice)
+			// The remote domain.
+			remoteDomain := "https://www.dji.com"
+			// Loop over the download zip urls.
+			for _, urls := range downloadZIPURLSlice {
+				// Get the domain from the url.
+				domain := getDomainFromURL(urls)
+				// Check if the domain is empty.
+				if domain == "" {
+					urls = remoteDomain + urls // Prepend the base URL if domain is empty
+				}
+				// Check if the url is valid.
+				if isUrlValid(urls) {
+					// Download the zip.
+					downloadZIP(urls, zipOutputDir)
+				}
+			}
+			// Get all the values.
+			for _, urls := range downloadPDFURLSlice {
+				// Get the domain from the url.
+				domain := getDomainFromURL(urls)
+				// Check if the domain is empty.
+				if domain == "" {
+					urls = remoteDomain + urls // Prepend the base URL if domain is empty
+				}
+				// Check if the url is valid.
+				if isUrlValid(urls) {
+					// Download the pdf.
+					downloadPDF(urls, pdfOutputDir)
+				}
+			}
 		}
 	}
 }
@@ -161,7 +374,7 @@ func scrapePageHTMLWithChrome(pageURL string) string {
 	options := append(chromedp.DefaultExecAllocatorOptions[:], // Chrome options
 		chromedp.Flag("headless", false),              // Run visible (set to true for headless)
 		chromedp.Flag("disable-gpu", true),            // Disable GPU
-		chromedp.WindowSize(1920, 1080),               // Set window size
+		chromedp.WindowSize(1, 1),                     // Set window size
 		chromedp.Flag("no-sandbox", true),             // Disable sandbox
 		chromedp.Flag("disable-setuid-sandbox", true), // Fix for Linux environments
 	)
