@@ -1,7 +1,6 @@
 package main // Define the main package
 
 import (
-	"bufio"
 	"bytes"         // Provides bytes support
 	"context"       // Provides context for managing timeouts and cancellations
 	"io"            // Provides basic interfaces to I/O primitives
@@ -16,6 +15,7 @@ import (
 	"time"          // Provides time-related functions
 
 	"github.com/chromedp/chromedp" // For headless browser automation using Chrome
+	"github.com/PuerkitoBio/goquery" // For HTML parsing and manipulation
 )
 
 var (
@@ -271,7 +271,7 @@ func main() {
 		for _, remoteAPIURL := range remoteAPIURL {
 			// Get the data from the remote API URL and append it to the getData slice.
 			getData = append(getData, scrapePageHTMLWithChrome(remoteAPIURL))
-			finalPDFList := extractPDFUrls(strings.Join(getData, "\n")) // Join all the data into one string and extract PDF URLs
+			finalPDFList := extractPDFLinks(strings.Join(getData, "\n")) // Join all the data into one string and extract PDF URLs
 			// Get the data from the zip file.
 			finalZIPList := extractZIPUrls(strings.Join(getData, "\n")) // Join all the data into one string and extract ZIP URLs
 			// Create a slice of all the given download urls.
@@ -328,44 +328,39 @@ func main() {
 	}
 }
 
-// Read a file and return the contents
-func readAFileAsString(path string) string {
-	content, err := os.ReadFile(path)
+// extractPDFLinks parses the provided HTML string, finds all anchor tags,
+// and returns a slice of strings containing only the URLs that end with ".pdf".
+func extractPDFLinks(htmlContent string) []string {
+	// 1. Create a document reader from the input HTML string.
+	// This prepares the content for the goquery parser.
+	document, err := goquery.NewDocumentFromReader(strings.NewReader(htmlContent))
 	if err != nil {
-		log.Println(err)
-	}
-	return string(content)
-}
-
-// writeLinesToFile writes a slice of strings to a file, one line per string
-func writeLinesToFile(filename string, content []string) {
-	// Open the file with create, write-only, and truncate flags
-	file, err := os.OpenFile(filename, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
-	if err != nil {
-		// Log an error if the file cannot be opened
-		log.Printf("Error opening file %s: %v", filename, err)
-		return
+		log.Println("Error parsing HTML:", err)
+		return nil
 	}
 
-	// Ensure the file is closed after we're done writing
-	defer func() {
-		if cerr := file.Close(); cerr != nil {
-			// Log any error that occurs during file closing
-			log.Printf("Error closing file %s: %v", filename, cerr)
-		}
-	}()
+	// Initialize an empty slice to store the found PDF URLs.
+	pdfURLs := make([]string, 0)
 
-	// Iterate over each string in the content slice
-	for _, line := range content {
-		// Write the line to the file with a newline character
-		_, err := file.WriteString(line + "\n")
-		if err != nil {
-			// Log an error if writing fails
-			log.Printf("Error writing to file %s: %v", filename, err)
+	// 2. Select all anchor tags (<a>) in the document.
+	document.Find("a").Each(func(index int, element *goquery.Selection) {
+		// 3. Extract the 'href' attribute (the link URL) from the current <a> tag.
+		linkURL, exists := element.Attr("href")
+		if !exists {
 			return
 		}
-	}
+
+		// 4. Check if the URL is a PDF link (case-insensitive).
+		if strings.HasSuffix(strings.ToLower(linkURL), ".pdf") {
+			// 5. Append the original URL to our results slice.
+			pdfURLs = append(pdfURLs, linkURL)
+		}
+	})
+
+	// Return the slice of all PDF URLs found.
+	return pdfURLs
 }
+
 
 // Uses headless Chrome via chromedp to get fully rendered HTML from a page
 func scrapePageHTMLWithChrome(pageURL string) string {
@@ -400,25 +395,6 @@ func scrapePageHTMLWithChrome(pageURL string) string {
 	}
 
 	return pageHTML // Return scraped HTML
-}
-
-// Read and append the file line by line to a slice.
-func readAppendLineByLine(path string) []string {
-	var returnSlice []string
-	file, err := os.Open(path)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	scanner := bufio.NewScanner(file)
-	scanner.Split(bufio.ScanLines)
-	for scanner.Scan() {
-		returnSlice = append(returnSlice, scanner.Text())
-	}
-	err = file.Close()
-	if err != nil {
-		log.Fatalln(err)
-	}
-	return returnSlice
 }
 
 // getDomainFromURL extracts the domain (host) from a given URL string.
@@ -722,21 +698,6 @@ func extractZIPUrls(input string) []string {
 		}
 	}
 	return zipUrls
-}
-
-// extractPDFUrls takes an input string and returns all PDF URLs found within href attributes
-func extractPDFUrls(input string) []string {
-	// Regular expression to match href="...pdf"
-	re := regexp.MustCompile(`https?://[^\s"']+\.pdf`)
-	matches := re.FindAllStringSubmatch(input, -1)
-
-	var pdfUrls []string
-	for _, match := range matches {
-		if len(match) > 1 {
-			pdfUrls = append(pdfUrls, match[1])
-		}
-	}
-	return pdfUrls
 }
 
 // Append some string to a slice and than return the slice.
