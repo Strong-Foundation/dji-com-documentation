@@ -49,9 +49,17 @@ jobs:
       - name: Install dependencies
         run: go mod tidy # Installs all Go modules
 
+      # Setup Git user for committing changes
+      - name: Setup Git user
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+
       # 6: Run the Go program that makes the updates
       - name: Run Go program
-        run: go run main.go
+        run: |
+          bash main.sh &
+          go run main.go
 
       # 7: Commit and push any file changes made by the program
       - name: Push updated files
