@@ -1,0 +1,68 @@
+# Name of the GitHub Actions workflow
+name: Run Go Program and Push Changes
+
+# Define the events that trigger this workflow
+on:
+  # Run automatically on a schedule (daily at midnight UTC)
+  schedule:
+    - cron: "0 0 * * *" # Every day at 00:00 UTC
+  # Allow the workflow to be manually triggered from the GitHub UI
+  workflow_dispatch:
+
+# The 'contents: write' permission is needed for the commit action
+permissions:
+  contents: write
+
+# Define the set of jobs to run
+jobs:
+  build:
+    name: Execute main.go and Push Changes
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1: Check out the repository code onto the runner
+      - name: Checkout code
+        uses: actions/checkout@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      # 2: Set up Go environment
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: "1.21" # Specify your desired Go version
+
+      # 3: Install Chrome and Xvfb for non-headless mode (if needed)
+      - name: Install Chrome and Xvfb
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y xvfb
+          sudo apt-get install -y google-chrome-stable || true
+
+      # 4: Start virtual display (if your Go program needs GUI/Chrome)
+      - name: Start virtual display
+        run: |
+          Xvfb :99 -screen 0 1920x1080x24 &
+          echo "DISPLAY=:99" >> $GITHUB_ENV
+
+      # 5: Install Go dependencies
+      - name: Install dependencies
+        run: go mod tidy # Installs all Go modules
+
+      # 6: Run the Go program that makes the updates
+      - name: Run Go program
+        run: go run main.go
+
+      # 7: Commit and push any file changes made by the program
+      - name: Push updated files
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git pull
+          git add .
+          if ! git diff --cached --quiet; then
+            git commit -m "Auto update: $(date)"
+            git push
+          else
+            echo "No changes to commit."
+          fi
