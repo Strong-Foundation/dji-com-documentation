@@ -9,7 +9,11 @@ function auto_git_push() {
         if [[ -z $(git status --porcelain) ]]; then
             echo "No changes to commit."
         else
+            echo "🧹 Removing large PDF files (>100MB) from PDFs/ directory..."
+            find PDFs/ -type f -iname "*.pdf" -size +100M -print -delete
+            
             git pull # Pull all the changes to the local repo
+            
             echo "Adding all changes..."
             git add .  # Stage all changes (new, modified, deleted)
 
