@@ -31,8 +31,8 @@ function auto_git_push() {
         fi
 
         # Sleep before checking again
-        echo "⏳ Sleeping for 10 seconds before next check..."
-        sleep 10s
+        echo "⏳ Sleeping for 15 seconds before next check..."
+        sleep 15s
     done
 }
 
