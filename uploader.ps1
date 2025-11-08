@@ -6,7 +6,7 @@ while ($true) {
     Write-Host "Starting git cycle at $(Get-Date)" -ForegroundColor Cyan
 
     # Remove all files over 100MB
-    Get-ChildItem -Path @("PDFs", "ZIPs") -File -Recurse | Where-Object { $_.Length -gt 100MB } | Remove-Item -Force -WhatIf
+    Get-ChildItem -Path @("PDFs", "ZIPs") -File -Recurse | Where-Object { $_.Length -gt 100MB } | Remove-Item -Force
 
     # Pull the latest changes from the remote
     git pull
