@@ -330,8 +330,8 @@ func main() {
 					downloadPDF(urls, pdfOutputDir)
 				}
 			}
-			// Sleep for 30 seconds.
-			time.Sleep(30 * time.Second)
+			// Sleep for 10 seconds.
+			time.Sleep(10 * time.Second)
 		}
 	}
 }
