@@ -37,8 +37,8 @@ function auto_git_push() { # Starts the definition of the function named auto_gi
         fi
 
         # Sleep before checking again
-        echo "⏳ Sleeping for 15 seconds before next check..." # Informs the user that the script is pausing
-        sleep 15s # Pauses the script execution for 15 seconds
+        echo "⏳ Sleeping for 5 seconds before next check..." # Informs the user that the script is pausing
+        sleep 5s # Pauses the script execution for 15 seconds
     done # Ends the 'while true' loop
 } # Ends the definition of the function
 
